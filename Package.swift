@@ -11,7 +11,10 @@ let package = Package(
         )
     ],
     dependencies: [
-        .package(url: "https://github.com/SimplyDanny/SwiftLintPlugins", .upToNextMajor(from: "0.58.2"))
+        .package(
+            url: "https://github.com/SimplyDanny/SwiftLintPlugins",
+            .upToNextMajor(from: "0.58.2")
+        )
     ],
     targets: [
         .target(
