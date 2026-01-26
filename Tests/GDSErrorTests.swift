@@ -37,7 +37,9 @@ struct GDSErrorTests {
             .accountIntervention,
             originalError: NSError(domain: "test", code: 1)
         )
+        // swiftlint:disable line_length
         #expect(error.errorUserInfo["originalError"] as? String == "The operation couldn’t be completed. (test error 1.)")
+        // swiftlint:enable line_length
         #expect(error.errorUserInfo["originalErrorKind"] as? String == "Error Domain=test Code=1 \"(null)\"")
     }
 

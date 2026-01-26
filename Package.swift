@@ -26,7 +26,7 @@ let package = Package(
         .target(
             name: "GDSUtilities",
             dependencies: [
-                .product(name: "GDSAnalytics", package: "mobile-ios-logging"),
+                .product(name: "GDSAnalytics", package: "mobile-ios-logging")
             ],
             plugins: [
                 .plugin(name: "SwiftLintBuildToolPlugin", package: "SwiftLintPlugins")
