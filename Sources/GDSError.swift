@@ -49,7 +49,6 @@ extension AnyErrorKind where Self.RawValue == String {
 
 public typealias OneLoginError = GDSError<ErrorKind.OneLogin>
 
-// should be in OL ?
 extension OneLoginError where Kind == ErrorKind.OneLogin {
     public init(
         _ kind: ErrorKind.OneLogin,
