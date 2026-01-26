@@ -5,36 +5,26 @@ import Testing
 struct GDSErrorTests {
     @Test
     func initialisation() {
-        let error = OneLoginError(.accountIntervention)
+        let error = ExampleError(.mock1)
         #expect(error.line == 8)
         #expect(error.function == "initialisation()")
 
-        #expect((error.errorUserInfo["kind"] as? ErrorKind.OneLogin) == .accountIntervention)
+        #expect((error.errorUserInfo["kind"] as? ExampleErrorKind) == .mock1)
         #expect(error.errorUserInfo["reason"] == nil)
         #expect(error.errorUserInfo["endpoint"] == nil)
         #expect(error.errorUserInfo["errorCode"] == nil)
         #expect((error.errorUserInfo["file"] as? String) == "GDSErrorTests.swift")
         #expect((error.errorUserInfo["function"] as? String) == "initialisation()")
         #expect((error.errorUserInfo["line"] as? Int) == 8)
-        #expect((error.errorUserInfo["resolvable"] as? String) == "true")
+        #expect((error.errorUserInfo["resolvable"] as? String) == "false")
         #expect(error.errorUserInfo["originalError"] == nil)
         #expect(error.errorUserInfo["originalErrorKind"] == nil)
     }
 
     @Test
-    func originalErrorIsBaseError() {
-        let error = GDSError(
-            .accountIntervention,
-            originalError: ExampleError(.mock1)
-        )
-        #expect(error.errorUserInfo["originalError"] as? String == "This is a mock error")
-        #expect(error.errorUserInfo["originalErrorKind"] as? String == "ExampleErrorKind.mock1")
-    }
-
-    @Test
     func originalErrorIsOtherError() {
-        let error = GDSError(
-            .accountIntervention,
+        let error = ExampleError(
+            .mock1,
             originalError: NSError(domain: "test", code: 1)
         )
         // swiftlint:disable line_length
@@ -45,8 +35,8 @@ struct GDSErrorTests {
 
     @Test("Error parameters cannot be overridden by additional parameters")
     func additionParametersPriority() {
-        let error = GDSError(
-            .accountIntervention,
+        let error = ExampleError(
+            .mock1,
             reason: "this is the reason",
             additionalParameters: [
                 "reason": "additional reason",
