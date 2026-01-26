@@ -66,7 +66,7 @@ extension BaseError {
         var originalKind: String?
 
         if let originalError {
-            if let original = originalError as? (any GDSError) {
+            if let original = originalError as? (any BaseError) {
                 originalErrorString = original.debugDescription
                 originalKind = String(describing: type(of: original.kind)) + "." + String(describing: original.kind)
             } else {
@@ -106,7 +106,7 @@ extension BaseError {
         var description: String = ""
         description.append(self.reason ?? self.kind.rawValue)
 
-        if let originalError = self.originalError as? any GDSError {
+        if let originalError = self.originalError as? any BaseError {
             description.append(" - (\(originalError.debugDescription))")
         }
 

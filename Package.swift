@@ -4,6 +4,8 @@ import PackageDescription
 
 let package = Package(
     name: "GDSUtilities",
+    defaultLocalization: "en",
+    platforms: [.iOS(.v16)],
     products: [
         .library(
             name: "GDSUtilities",
