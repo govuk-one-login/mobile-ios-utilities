@@ -47,6 +47,36 @@ struct GDSErrorTests {
         #expect(error.errorUserInfo["reason"] as? String == "this is the reason")
         #expect(error.errorUserInfo["filesExist"] as? String == "true")
     }
+    
+    @Test
+    func error_reason() {
+        #expect(ExampleError(.mock1, reason: "This is a mock error").reason == "This is a mock error")
+    }
+    
+    @Test
+    func error_debugDescription() {
+        #expect(ExampleError(.mock1).debugDescription == "This is a mock error")
+    }
+    
+    @Test
+    func error_hash() {
+        #expect(ExampleError(.mock1, statusCode: 400).hash == "811ce6bfad80ed8a9ff40934ea60241d")
+    }
+    
+    @Test
+    func error_logToCrashlytics() {
+        #expect(ExampleError(.mock1, statusCode: 400).logToCrashlytics == true)
+    }
+    
+    @Test
+    func error_localizedDesecription() {
+        #expect(ExampleError(.mock1, statusCode: 400).localizedDescription == "This is a mock error")
+    }
+    
+    @Test
+    func test_errorKind_localizedDescription() {
+        #expect(ExampleErrorKind.mock1.localizedDescription == "This is a mock error")
+    }
 }
 
 typealias ExampleError = GDSError<ExampleErrorKind>
