@@ -113,7 +113,8 @@ do {
 ```
 
 N.B.
-A typed throw of `GDSError` allows us to bypass casting the error and provides a cleaner syntax, consider this using this functionality creating your APIs.
+
+A typed throw of `GDSError` allows us to bypass casting the error and provides a cleaner syntax, consider using this functionality when creating your APIs.
 
 The above example includes a `GDSExampleErrorKind` in both the top-level app code and the consumer code.
 This is to facilitate matching on the error where no shared implementations of `GDSErrorKind` exist in the package, it is required to match the `kind` based on it's `String` `rawValue`; much like the `domain` property of `NSError`.
