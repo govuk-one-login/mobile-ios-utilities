@@ -19,18 +19,6 @@ public protocol GDSError:
     var additionalParameters: [String: any Sendable] { get }
 }
 
-/// Implementation for `Equatable` and pattern matching
-extension GDSError {
-    public static func == (lhs: Self, rhs: Self) -> Bool {
-        lhs.kind == rhs.kind
-    }
-
-    public static func ~= (rhs: Self, lhs: Error) -> Bool {
-        (lhs as? Self) == rhs
-    }
-}
-
-/// Needed for conformance to LoggableError
 extension GDSError {
     public var hash: String? {
         var string: String = ""
@@ -43,6 +31,17 @@ extension GDSError {
         return digest.map {
             String(format: "%02hhx", $0)
         }.joined()
+    }
+}
+
+/// Implementation for `Equatable` and pattern matching
+extension GDSError {
+    public static func == (lhs: Self, rhs: Self) -> Bool {
+        lhs.kind == rhs.kind
+    }
+
+    public static func ~= (rhs: Self, lhs: Error) -> Bool {
+        (lhs as? Self) == rhs
     }
 }
 

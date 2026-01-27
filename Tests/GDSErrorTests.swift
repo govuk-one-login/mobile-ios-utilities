@@ -97,8 +97,8 @@ struct GDSExampleError<Kind: GDSErrorKind>: GDSError {
     let line: Int
     let resolvable: Bool
     let originalError: (any Error)?
-    let additionalParameters: [String : any Sendable]
-    
+    let additionalParameters: [String: any Sendable]
+
     init(
         _ kind: Kind,
         reason: String? = nil,
@@ -109,7 +109,7 @@ struct GDSExampleError<Kind: GDSErrorKind>: GDSError {
         line: Int = #line,
         resolvable: Bool = false,
         originalError: (any Error)? = nil,
-        additionalParameters: [String : any Sendable] = [:]
+        additionalParameters: [String: any Sendable] = [:]
     ) {
         self.kind = kind
         self.reason = reason
