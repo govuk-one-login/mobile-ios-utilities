@@ -1,13 +1,11 @@
 import CryptoKit
 import Foundation
-import GDSAnalytics
 
-public protocol BaseError:
+public protocol GDSError:
     Equatable,
-    LoggableError,
     CustomNSError,
     CustomDebugStringConvertible
-    where Kind: AnyErrorKind {
+    where Kind: GDSErrorKind {
     associatedtype Kind
     var kind: Kind { get }
     var reason: String? { get }
@@ -22,7 +20,7 @@ public protocol BaseError:
 }
 
 /// Implementation for `Equatable` and pattern matching
-extension BaseError {
+extension GDSError {
     public static func == (lhs: Self, rhs: Self) -> Bool {
         lhs.kind == rhs.kind
     }
@@ -32,15 +30,8 @@ extension BaseError {
     }
 }
 
-/// Needed for conformance to AnyErrorKind
-extension BaseError {
-    public var logToCrashlytics: Bool {
-        kind.logToCrashlytics
-    }
-}
-
 /// Needed for conformance to LoggableError
-extension BaseError {
+extension GDSError {
     public var hash: String? {
         var string: String = ""
         if let statusCode {
@@ -56,7 +47,7 @@ extension BaseError {
 }
 
 /// CustomNSError properties
-extension BaseError {
+extension GDSError {
     public static var errorDomain: String {
         String(describing: self.Kind)
     }
@@ -66,7 +57,7 @@ extension BaseError {
         var originalKind: String?
 
         if let originalError {
-            if let original = originalError as? (any BaseError) {
+            if let original = originalError as? (any GDSError) {
                 originalErrorString = original.debugDescription
                 originalKind = String(describing: type(of: original.kind)) + "." + String(describing: original.kind)
             } else {
@@ -101,15 +92,21 @@ extension BaseError {
 }
 
 /// CustomDebugStringConvertable properties
-extension BaseError {
+extension GDSError {
     public var debugDescription: String {
         var description: String = ""
         description.append(self.reason ?? self.kind.rawValue)
 
-        if let originalError = self.originalError as? any BaseError {
+        if let originalError = self.originalError as? any GDSError {
             description.append(" - (\(originalError.debugDescription))")
         }
 
         return description
+    }
+}
+
+extension GDSError where Kind.RawValue == String {
+    public var localizedDescription: String {
+        kind.rawValue
     }
 }

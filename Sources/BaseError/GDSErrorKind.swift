@@ -1,17 +1,9 @@
 // does not conform to `CustomStringConvertable` or `CustomDebugStringConvertable` to avoid infinite loop
-public protocol AnyErrorKind: Sendable,
+public protocol GDSErrorKind: Sendable,
                               RawRepresentable,
-                              Equatable where RawValue == String {
-    var logToCrashlytics: Bool { get }
-}
+                              Equatable where RawValue == String { }
 
-extension AnyErrorKind {
-    public var logToCrashlytics: Bool {
-        true
-    }
-}
-
-extension AnyErrorKind {
+extension GDSErrorKind {
     public var description: String {
         rawValue == "\(self)" ?
             "\(self)" :
@@ -19,10 +11,8 @@ extension AnyErrorKind {
     }
 }
 
-extension AnyErrorKind where Self.RawValue == String {
+extension GDSErrorKind where Self.RawValue == String {
     public var localizedDescription: String {
         self.rawValue
     }
 }
-
-public enum ErrorKind {}

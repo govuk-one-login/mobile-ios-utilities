@@ -14,10 +14,6 @@ let package = Package(
     ],
     dependencies: [
         .package(
-            url: "https://github.com/govuk-one-login/mobile-ios-logging",
-            .upToNextMajor(from: "6.0.0")
-        ),
-        .package(
             url: "https://github.com/SimplyDanny/SwiftLintPlugins",
             .upToNextMajor(from: "0.58.2")
         )
@@ -25,9 +21,6 @@ let package = Package(
     targets: [
         .target(
             name: "GDSUtilities",
-            dependencies: [
-                .product(name: "GDSAnalytics", package: "mobile-ios-logging")
-            ],
             plugins: [
                 .plugin(name: "SwiftLintBuildToolPlugin", package: "SwiftLintPlugins")
             ]

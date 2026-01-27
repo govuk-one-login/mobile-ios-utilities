@@ -9,7 +9,7 @@ struct GDSErrorTests {
         #expect(error.line == 8)
         #expect(error.function == "initialisation()")
 
-        #expect((error.errorUserInfo["kind"] as? ExampleErrorKind) == .mock1)
+        #expect((error.errorUserInfo["kind"] as? GDSExampleErrorKind) == .mock1)
         #expect(error.errorUserInfo["reason"] == nil)
         #expect(error.errorUserInfo["endpoint"] == nil)
         #expect(error.errorUserInfo["errorCode"] == nil)
@@ -70,31 +70,37 @@ struct GDSErrorTests {
     }
 
     @Test
-    func error_logToCrashlytics() {
-        #expect(ExampleError(.mock1, statusCode: 400).logToCrashlytics == true)
-    }
-
-    @Test
     func error_localizedDesecription() {
         #expect(ExampleError(.mock1, statusCode: 400).localizedDescription == "This is a mock error")
     }
 
     @Test
     func test_errorKind() {
-        #expect(ExampleErrorKind.mock1.localizedDescription == "This is a mock error")
-        #expect(ExampleErrorKind.mock1.description == "mock1 - This is a mock error")
+        #expect(GDSExampleErrorKind.mock1.localizedDescription == "This is a mock error")
+        #expect(GDSExampleErrorKind.mock1.description == "mock1 - This is a mock error")
     }
 }
 
-typealias ExampleError = GDSError<ExampleErrorKind>
+typealias ExampleError = GDSExampleError<GDSExampleErrorKind>
 
-enum ExampleErrorKind: String, AnyErrorKind {
+enum GDSExampleErrorKind: String, GDSErrorKind {
     case mock1 = "This is a mock error"
 }
 
-extension ExampleError {
+struct GDSExampleError<Kind: GDSErrorKind>: GDSError {
+    let kind: Kind
+    let reason: String?
+    let endpoint: String?
+    let statusCode: Int?
+    let file: String
+    let function: String
+    let line: Int
+    let resolvable: Bool
+    let originalError: (any Error)?
+    let additionalParameters: [String : any Sendable]
+    
     init(
-        _ kind: ExampleErrorKind,
+        _ kind: Kind,
         reason: String? = nil,
         endpoint: String? = nil,
         statusCode: Int? = nil,
@@ -102,20 +108,18 @@ extension ExampleError {
         function: String = #function,
         line: Int = #line,
         resolvable: Bool = false,
-        originalError: Error? = nil,
-        additionalParameters: [String: any Sendable] = [:]
+        originalError: (any Error)? = nil,
+        additionalParameters: [String : any Sendable] = [:]
     ) {
-        self.init(
-            kind: kind,
-            reason: reason,
-            endpoint: endpoint,
-            statusCode: statusCode,
-            file: file,
-            function: function,
-            line: line,
-            resolvable: resolvable,
-            originalError: originalError,
-            additionalParameters: additionalParameters
-        )
+        self.kind = kind
+        self.reason = reason
+        self.endpoint = endpoint
+        self.statusCode = statusCode
+        self.file = file
+        self.function = function
+        self.line = line
+        self.resolvable = resolvable
+        self.originalError = originalError
+        self.additionalParameters = additionalParameters
     }
 }
