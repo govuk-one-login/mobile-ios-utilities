@@ -40,9 +40,3 @@ extension GDSError where Kind.RawValue == String {
         kind.rawValue
     }
 }
-
-extension AnyErrorKind where Self.RawValue == String {
-    public var localizedDescription: String {
-        self.rawValue
-    }
-}

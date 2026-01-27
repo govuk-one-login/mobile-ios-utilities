@@ -46,11 +46,17 @@ struct GDSErrorTests {
 
         #expect(error.errorUserInfo["reason"] as? String == "this is the reason")
         #expect(error.errorUserInfo["filesExist"] as? String == "true")
+        #expect(error == ExampleError(.mock1))
     }
 
     @Test
     func error_reason() {
         #expect(ExampleError(.mock1, reason: "This is a mock error").reason == "This is a mock error")
+    }
+    
+    @Test
+    func error_errorCode() {
+        #expect(ExampleError(.mock1).errorCode == 59)
     }
 
     @Test
@@ -74,8 +80,9 @@ struct GDSErrorTests {
     }
 
     @Test
-    func test_errorKind_localizedDescription() {
+    func test_errorKind() {
         #expect(ExampleErrorKind.mock1.localizedDescription == "This is a mock error")
+        #expect(ExampleErrorKind.mock1.description == "mock1 - This is a mock error")
     }
 }
 
