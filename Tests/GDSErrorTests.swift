@@ -53,7 +53,7 @@ struct GDSErrorTests {
     func error_reason() {
         #expect(ExampleError(.mock1, reason: "This is a mock error").reason == "This is a mock error")
     }
-    
+
     @Test
     func error_errorCode() {
         #expect(ExampleError(.mock1).errorCode == 59)
