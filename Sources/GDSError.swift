@@ -2,7 +2,6 @@ import CryptoKit
 import Foundation
 
 public protocol GDSError:
-    Error,
     Equatable,
     CustomNSError,
     CustomDebugStringConvertible
