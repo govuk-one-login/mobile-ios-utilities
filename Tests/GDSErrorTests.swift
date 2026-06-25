@@ -56,12 +56,12 @@ struct GDSErrorTests {
 
     @Test
     func error_errorCode() {
-        #expect(ExampleError(.mock1).errorCode == 59)
+        #expect(ExampleError(.mock1).errorCode == 1)
     }
 
     @Test
     func error_debugDescription() {
-        #expect(ExampleError(.mock1).debugDescription == "This is a mock error")
+        #expect(ExampleError(.mock1).debugDescription == "mock1 - This is a mock error")
     }
 
     @Test
@@ -71,7 +71,7 @@ struct GDSErrorTests {
 
     @Test
     func error_localizedDesecription() {
-        #expect(ExampleError(.mock1, statusCode: 400).localizedDescription == "This is a mock error")
+        #expect(ExampleError(.mock1, statusCode: 400).localizedDescription == "mock1 - This is a mock error")
     }
 
     @Test
@@ -79,12 +79,25 @@ struct GDSErrorTests {
         #expect(GDSExampleErrorKind.mock1.localizedDescription == "This is a mock error")
         #expect(GDSExampleErrorKind.mock1.description == "mock1 - This is a mock error")
     }
+
+    @Test
+    func test_domain() async throws {
+        #expect(ExampleError.errorDomain == "GDSExampleErrorKind")
+    }
 }
 
 typealias ExampleError = GDSExampleError<GDSExampleErrorKind>
 
-enum GDSExampleErrorKind: String, GDSErrorKind {
-    case mock1 = "This is a mock error"
+enum GDSExampleErrorKind: Int, GDSErrorKind {
+    case mock1 = 1
+
+    var description: String {
+        "mock1 - This is a mock error"
+    }
+
+    var localizedDescription: String {
+        "This is a mock error"
+    }
 }
 
 struct GDSExampleError<Kind: GDSErrorKind>: GDSError {
