@@ -85,7 +85,8 @@ extension GDSError {
     }
 
     public var errorCode: Int {
-        self.kind.rawValue
+        // NOTE: This is not perfect but will help group errors better.
+        statusCode ?? self.line
     }
 }
 
@@ -93,7 +94,7 @@ extension GDSError {
 extension GDSError {
     public var debugDescription: String {
         var description: String = ""
-        description.append(self.reason ?? self.kind.description)
+        description.append(self.reason ?? self.kind.rawValue)
 
         if let originalError = self.originalError as? any GDSError {
             description.append(" - (\(originalError.debugDescription))")
@@ -103,8 +104,8 @@ extension GDSError {
     }
 }
 
-extension GDSError {
+extension GDSError where Kind.RawValue == String {
     public var localizedDescription: String {
-        kind.description
+        kind.rawValue
     }
 }
