@@ -95,8 +95,8 @@ extension GDSError {
         var description: String = ""
         description.append(self.reason ?? self.kind.description)
 
-        if let originalError = self.originalError as? any GDSError {
-            description.append(" - (\(originalError.debugDescription))")
+        if let originalError {
+            description.append(" - (\(String(reflecting: originalError)))")
         }
 
         return description
