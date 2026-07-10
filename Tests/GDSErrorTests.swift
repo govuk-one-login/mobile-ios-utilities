@@ -84,31 +84,31 @@ struct GDSErrorTests {
     func test_domain() async throws {
         #expect(ExampleError.errorDomain == "GDSExampleErrorKind")
     }
-    
+
     @Test
     func test_anyGDSError_debugDescription() {
         let anyGDSError = ExampleError(
             .mock1
         )
-        
+
         let error = GDSExampleError(
             GDSExampleErrorKind.mock1,
             originalError: anyGDSError
         )
-        
+
         #expect(String(reflecting: error) == "mock1 - This is a mock error - (mock1 - This is a mock error)")
     }
-    
+
     @Test
     func test_nonGDSError_debugDescription() {
         let anyDebugDescription = "any"
         let nonGDSError = ErrorStub(_debugDescription: anyDebugDescription)
-        
+
         let error = ExampleError(
             .mock1,
             originalError: nonGDSError
         )
-        
+
         #expect(String(reflecting: error) == "mock1 - This is a mock error - (any)")
     }
 
@@ -119,11 +119,11 @@ struct GDSErrorTests {
             .mock1,
             reason: anyReason
         )
-        
+
         let error = ExampleError(
             .mock1,
             originalError: anyGDSError)
-        
+
         #expect(String(reflecting: error) == "mock1 - This is a mock error - (any)")
     }
 }
@@ -180,9 +180,11 @@ struct GDSExampleError<Kind: GDSErrorKind>: GDSError {
 }
 
 struct ErrorStub: Error, CustomDebugStringConvertible {
-    
+
+    // swiftlint:disable identifier_name
     let _debugDescription: String
-    
+    // swiftlint:enable identifier_name
+
     var debugDescription: String {
         return _debugDescription
     }
