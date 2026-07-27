@@ -1,7 +1,9 @@
+// swiftlint:disable file_length
 import Foundation
 import Testing
 @testable import GDSUtilities
 
+// swiftlint:disable type_body_length
 struct GDSErrorTests {
     @Test
     func initialisation() {
@@ -338,6 +340,7 @@ struct GDSErrorTests {
         )
     }
 }
+// swiftlint:enable type_body_length
 
 typealias ExampleError = GDSExampleError<GDSExampleErrorKind>
 
