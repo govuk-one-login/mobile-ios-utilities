@@ -4,7 +4,8 @@ import Foundation
 public protocol GDSError:
     Equatable,
     CustomNSError,
-    CustomDebugStringConvertible
+    CustomDebugStringConvertible,
+    LocalizedError
     where Kind: GDSErrorKind {
     associatedtype Kind
     var kind: Kind { get }
@@ -15,7 +16,7 @@ public protocol GDSError:
     var function: String { get }
     var line: Int { get }
     var resolvable: Bool { get }
-    var originalError: Error? { get }
+    var originalError: (any Error)? { get }
     var additionalParameters: [String: any Sendable] { get }
 }
 
@@ -61,7 +62,8 @@ extension GDSError {
             "function": self.function,
             "line": self.line,
             "resolvable": String(self.resolvable),
-            NSUnderlyingErrorKey: self.originalError
+            NSUnderlyingErrorKey: self.originalError,
+            NSLocalizedDescriptionKey: self.errorDescription
         ]
 
         let paramsToLog = params.merging(additionalParameters) { lhs, _ in
@@ -76,22 +78,19 @@ extension GDSError {
     }
 }
 
-/// CustomDebugStringConvertable properties
+/// Error description properties
 extension GDSError {
     public var debugDescription: String {
-        var description: String = ""
-        description.append(self.reason ?? self.kind.description)
+        let localizedDescription = errorDescription ?? "(null)"
 
-        if let originalError {
-            description.append(" - (\(String(reflecting: originalError)))")
-        }
-
-        return description
+        return "Error Domain=\(Self.errorDomain) Code=\(errorCode) \"\(localizedDescription)\""
     }
-}
 
-extension GDSError {
-    public var localizedDescription: String {
-        kind.description
+    public var errorDescription: String? {
+        kind.localizedDescription
+    }
+
+    public var failureReason: String? {
+        reason
     }
 }

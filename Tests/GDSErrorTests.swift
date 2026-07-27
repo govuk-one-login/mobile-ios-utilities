@@ -135,11 +135,16 @@ struct GDSErrorTests {
             .mock1,
             reason: "this is the reason",
             additionalParameters: [
+                NSLocalizedDescriptionKey: "additional description",
                 "reason": "additional reason",
                 "filesExist": "true"
             ]
         )
 
+        #expect(
+            error.errorUserInfo[NSLocalizedDescriptionKey] as? String ==
+                error.errorDescription
+        )
         #expect(error.errorUserInfo["reason"] as? String == "this is the reason")
         #expect(error.errorUserInfo["filesExist"] as? String == "true")
         #expect(error == ExampleError(.mock1))
@@ -151,13 +156,26 @@ struct GDSErrorTests {
     }
 
     @Test
+    func error_failureReason() {
+        let reason = "This is a mock error"
+        let error = ExampleError(.mock1, reason: reason)
+        let nsError = error as NSError
+
+        #expect(error.failureReason == reason)
+        #expect(nsError.localizedFailureReason == reason)
+    }
+
+    @Test
     func error_errorCode() {
         #expect(ExampleError(.mock1).errorCode == 1)
     }
 
     @Test
     func error_reflectingDescription() {
-        #expect(String(reflecting: ExampleError(.mock1)) == "mock1 - This is a mock error")
+        #expect(
+            String(reflecting: ExampleError(.mock1)) ==
+                "Error Domain=GDSExampleErrorKind Code=1 \"This is a mock error\""
+        )
     }
 
     @Test
@@ -166,14 +184,43 @@ struct GDSErrorTests {
     }
 
     @Test
-    func error_localizedDesecription() {
-        #expect(ExampleError(.mock1, statusCode: 400).localizedDescription == "mock1 - This is a mock error")
+    func error_localizedDescription() {
+        let error = ExampleError(.mock1, statusCode: 400)
+        let nsError = error as NSError
+
+        #expect(error.errorDescription == "This is a mock error")
+        #expect(error.localizedDescription == error.errorDescription)
+        #expect(
+            error.errorUserInfo[NSLocalizedDescriptionKey] as? String ==
+                error.errorDescription
+        )
+        #expect(nsError.localizedDescription == error.errorDescription)
+        #expect(
+            nsError.userInfo[NSLocalizedDescriptionKey] as? String ==
+                error.errorDescription
+        )
+    }
+
+    @Test
+    func missingErrorDescriptionIsNotIncludedInUserInfo() {
+        let error = MissingDescriptionError()
+        let nsError = error as NSError
+        let expectedDebugDescription =
+            "Error Domain=GDSExampleErrorKind Code=1 \"(null)\""
+
+        #expect(error.errorDescription == nil)
+        #expect(error.errorUserInfo[NSLocalizedDescriptionKey] == nil)
+        #expect(nsError.userInfo[NSLocalizedDescriptionKey] == nil)
+        #expect(error.debugDescription == expectedDebugDescription)
+        #expect(String(reflecting: error) == expectedDebugDescription)
+        #expect(String(reflecting: nsError) == expectedDebugDescription)
     }
 
     @Test
     func test_errorKind() {
         #expect(GDSExampleErrorKind.mock1.localizedDescription == "This is a mock error")
         #expect(GDSExampleErrorKind.mock1.description == "mock1 - This is a mock error")
+        #expect(DescriptionOnlyErrorKind.mock1.localizedDescription == "mock1")
     }
 
     @Test
@@ -192,7 +239,10 @@ struct GDSErrorTests {
             originalError: anyGDSError
         )
 
-        #expect(String(reflecting: error) == "mock1 - This is a mock error - (mock1 - This is a mock error)")
+        #expect(
+            String(reflecting: error) ==
+                "Error Domain=GDSExampleErrorKind Code=1 \"This is a mock error\""
+        )
     }
 
     @Test
@@ -205,7 +255,10 @@ struct GDSErrorTests {
             originalError: nonGDSError
         )
 
-        #expect(String(reflecting: error) == "mock1 - This is a mock error - (any)")
+        #expect(
+            String(reflecting: error) ==
+                "Error Domain=GDSExampleErrorKind Code=1 \"This is a mock error\""
+        )
     }
 
     @Test
@@ -220,7 +273,10 @@ struct GDSErrorTests {
             .mock1,
             originalError: anyGDSError)
 
-        #expect(String(reflecting: error) == "mock1 - This is a mock error - (any)")
+        #expect(
+            String(reflecting: error) ==
+                "Error Domain=GDSExampleErrorKind Code=1 \"This is a mock error\""
+        )
     }
 }
 
@@ -235,6 +291,33 @@ enum GDSExampleErrorKind: Int, GDSErrorKind {
 
     var localizedDescription: String {
         "This is a mock error"
+    }
+}
+
+private enum DescriptionOnlyErrorKind: Int, GDSErrorKind {
+    case mock1 = 1
+
+    var description: String {
+        "mock1"
+    }
+}
+
+private struct MissingDescriptionError: GDSError {
+    let kind: GDSExampleErrorKind = .mock1
+    let reason: String? = nil
+    let endpoint: String? = nil
+    let statusCode: Int? = nil
+    let file = "GDSErrorTests.swift"
+    let function = "missingErrorDescriptionIsNotIncludedInUserInfo()"
+    let line = 1
+    let resolvable = false
+    let originalError: (any Error)? = nil
+    let additionalParameters: [String: any Sendable] = [
+        NSLocalizedDescriptionKey: "Additional description"
+    ]
+
+    var errorDescription: String? {
+        nil
     }
 }
 
