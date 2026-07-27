@@ -11,13 +11,36 @@ struct GDSErrorTests {
 
         #expect((error.errorUserInfo["kind"] as? GDSExampleErrorKind) == .mock1)
         #expect(error.errorUserInfo[NSLocalizedFailureReasonErrorKey] == nil)
-        #expect(error.errorUserInfo["endpoint"] == nil)
+        #expect(error.errorUserInfo[NSURLErrorKey] == nil)
         #expect(error.errorUserInfo["errorCode"] == nil)
         #expect((error.errorUserInfo["file"] as? String) == "GDSErrorTests.swift")
         #expect((error.errorUserInfo["function"] as? String) == "initialisation()")
         #expect((error.errorUserInfo["line"] as? Int) == 8)
         #expect((error.errorUserInfo["resolvable"] as? String) == "false")
         #expect(error.errorUserInfo[NSUnderlyingErrorKey] == nil)
+    }
+
+    @Test
+    func endpointIsIncludedAsURL() throws {
+        let endpoint = "https://example.com/path"
+        let error = ExampleError(.mock1, endpoint: endpoint)
+        let url = try #require(error.errorUserInfo[NSURLErrorKey] as? URL)
+        let nsError = error as NSError
+
+        #expect(error.endpoint == endpoint)
+        #expect(url.absoluteString == endpoint)
+        #expect(error.errorUserInfo["endpoint"] == nil)
+        #expect(nsError.userInfo[NSURLErrorKey] as? URL == url)
+    }
+
+    @Test
+    func invalidEndpointIsIncludedAsString() {
+        let endpoint = "https://exa mple.com"
+        let error = ExampleError(.mock1, endpoint: endpoint)
+
+        #expect(error.endpoint == endpoint)
+        #expect(error.errorUserInfo[NSURLErrorKey] == nil)
+        #expect(error.errorUserInfo["endpoint"] as? String == endpoint)
     }
 
     @Test

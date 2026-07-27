@@ -53,9 +53,8 @@ extension GDSError {
     }
 
     public var errorUserInfo: [String: Any] {
-        let params: [String: Any?] = [
+        var params: [String: Any?] = [
             "kind": self.kind,
-            "endpoint": self.endpoint,
             "statusCode": self.statusCode,
             "file": self.file.components(separatedBy: "/").last,
             "function": self.function,
@@ -65,6 +64,14 @@ extension GDSError {
             NSLocalizedDescriptionKey: self.errorDescription,
             NSLocalizedFailureReasonErrorKey: self.failureReason
         ]
+
+        if let endpoint {
+            if let url = URL(string: endpoint) {
+                params[NSURLErrorKey] = url
+            } else {
+                params["endpoint"] = endpoint
+            }
+        }
 
         let paramsToLog = params.merging(additionalParameters) { lhs, _ in
             lhs
