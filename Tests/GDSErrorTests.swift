@@ -8,7 +8,7 @@ struct GDSErrorTests {
     @Test
     func initialisation() {
         let error = ExampleError(.mock1)
-        #expect(error.line == 8)
+        #expect(error.line == 10)
         #expect(error.function == "initialisation()")
 
         let nsError = error as NSError
@@ -20,7 +20,7 @@ struct GDSErrorTests {
         #expect(error.errorUserInfo["errorCode"] == nil)
         #expect((error.errorUserInfo["file"] as? String) == "GDSErrorTests.swift")
         #expect((error.errorUserInfo["function"] as? String) == "initialisation()")
-        #expect((error.errorUserInfo["line"] as? Int) == 8)
+        #expect((error.errorUserInfo["line"] as? Int) == 10)
         #expect((error.errorUserInfo["resolvable"] as? Bool) == false)
         #expect(error.errorUserInfo[NSUnderlyingErrorKey] == nil)
     }
