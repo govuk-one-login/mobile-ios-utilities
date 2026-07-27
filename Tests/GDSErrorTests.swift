@@ -9,7 +9,10 @@ struct GDSErrorTests {
         #expect(error.line == 8)
         #expect(error.function == "initialisation()")
 
-        #expect((error.errorUserInfo["kind"] as? GDSExampleErrorKind) == .mock1)
+        let nsError = error as NSError
+
+        #expect(nsError.domain == ExampleError.errorDomain)
+        #expect(nsError.code == error.errorCode)
         #expect(error.errorUserInfo[NSLocalizedFailureReasonErrorKey] == nil)
         #expect(error.errorUserInfo[NSURLErrorKey] == nil)
         #expect(error.errorUserInfo["errorCode"] == nil)

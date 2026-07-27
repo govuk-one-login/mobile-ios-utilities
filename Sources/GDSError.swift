@@ -54,7 +54,6 @@ extension GDSError {
 
     public var errorUserInfo: [String: Any] {
         var params: [String: Any?] = [
-            "kind": self.kind,
             "statusCode": self.statusCode,
             "file": self.file.components(separatedBy: "/").last,
             "function": self.function,
