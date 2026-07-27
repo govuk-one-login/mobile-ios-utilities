@@ -10,7 +10,7 @@ struct GDSErrorTests {
         #expect(error.function == "initialisation()")
 
         #expect((error.errorUserInfo["kind"] as? GDSExampleErrorKind) == .mock1)
-        #expect(error.errorUserInfo["reason"] == nil)
+        #expect(error.errorUserInfo[NSLocalizedFailureReasonErrorKey] == nil)
         #expect(error.errorUserInfo["endpoint"] == nil)
         #expect(error.errorUserInfo["errorCode"] == nil)
         #expect((error.errorUserInfo["file"] as? String) == "GDSErrorTests.swift")
@@ -136,7 +136,7 @@ struct GDSErrorTests {
             reason: "this is the reason",
             additionalParameters: [
                 NSLocalizedDescriptionKey: "additional description",
-                "reason": "additional reason",
+                NSLocalizedFailureReasonErrorKey: "additional reason",
                 "filesExist": "true"
             ]
         )
@@ -145,7 +145,10 @@ struct GDSErrorTests {
             error.errorUserInfo[NSLocalizedDescriptionKey] as? String ==
                 error.errorDescription
         )
-        #expect(error.errorUserInfo["reason"] as? String == "this is the reason")
+        #expect(
+            error.errorUserInfo[NSLocalizedFailureReasonErrorKey] as? String ==
+                "this is the reason"
+        )
         #expect(error.errorUserInfo["filesExist"] as? String == "true")
         #expect(error == ExampleError(.mock1))
     }
@@ -162,7 +165,37 @@ struct GDSErrorTests {
         let nsError = error as NSError
 
         #expect(error.failureReason == reason)
+        #expect(error.errorUserInfo[NSLocalizedFailureReasonErrorKey] as? String == reason)
         #expect(nsError.localizedFailureReason == reason)
+        #expect(nsError.userInfo[NSLocalizedFailureReasonErrorKey] as? String == reason)
+    }
+
+    @Test
+    func errorUserInfoUsesFailureReasonWitness() {
+        let error = OverriddenFailureReasonError()
+        let nsError = error as NSError
+
+        #expect(error.reason == "Original reason")
+        #expect(error.failureReason == "Localized failure reason")
+        #expect(
+            error.errorUserInfo[NSLocalizedFailureReasonErrorKey] as? String ==
+                error.failureReason
+        )
+        #expect(nsError.localizedFailureReason == error.failureReason)
+        #expect(
+            nsError.userInfo[NSLocalizedFailureReasonErrorKey] as? String ==
+                error.failureReason
+        )
+    }
+
+    @Test
+    func missingFailureReasonCannotBeInjectedByAdditionalParameters() {
+        let error = MissingDescriptionError()
+        let nsError = error as NSError
+
+        #expect(error.failureReason == nil)
+        #expect(error.errorUserInfo[NSLocalizedFailureReasonErrorKey] == nil)
+        #expect(nsError.userInfo[NSLocalizedFailureReasonErrorKey] == nil)
     }
 
     @Test
@@ -313,11 +346,29 @@ private struct MissingDescriptionError: GDSError {
     let resolvable = false
     let originalError: (any Error)? = nil
     let additionalParameters: [String: any Sendable] = [
-        NSLocalizedDescriptionKey: "Additional description"
+        NSLocalizedDescriptionKey: "Additional description",
+        NSLocalizedFailureReasonErrorKey: "Additional failure reason"
     ]
 
     var errorDescription: String? {
         nil
+    }
+}
+
+private struct OverriddenFailureReasonError: GDSError {
+    let kind: GDSExampleErrorKind = .mock1
+    let reason: String? = "Original reason"
+    let endpoint: String? = nil
+    let statusCode: Int? = nil
+    let file = "GDSErrorTests.swift"
+    let function = "errorUserInfoUsesFailureReasonWitness()"
+    let line = 1
+    let resolvable = false
+    let originalError: (any Error)? = nil
+    let additionalParameters: [String: any Sendable] = [:]
+
+    var failureReason: String? {
+        "Localized failure reason"
     }
 }
 

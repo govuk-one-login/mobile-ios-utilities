@@ -55,7 +55,6 @@ extension GDSError {
     public var errorUserInfo: [String: Any] {
         let params: [String: Any?] = [
             "kind": self.kind,
-            "reason": self.reason,
             "endpoint": self.endpoint,
             "statusCode": self.statusCode,
             "file": self.file.components(separatedBy: "/").last,
@@ -63,7 +62,8 @@ extension GDSError {
             "line": self.line,
             "resolvable": String(self.resolvable),
             NSUnderlyingErrorKey: self.originalError,
-            NSLocalizedDescriptionKey: self.errorDescription
+            NSLocalizedDescriptionKey: self.errorDescription,
+            NSLocalizedFailureReasonErrorKey: self.failureReason
         ]
 
         let paramsToLog = params.merging(additionalParameters) { lhs, _ in
