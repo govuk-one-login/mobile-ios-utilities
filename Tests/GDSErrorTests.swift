@@ -19,7 +19,7 @@ struct GDSErrorTests {
         #expect((error.errorUserInfo["file"] as? String) == "GDSErrorTests.swift")
         #expect((error.errorUserInfo["function"] as? String) == "initialisation()")
         #expect((error.errorUserInfo["line"] as? Int) == 8)
-        #expect((error.errorUserInfo["resolvable"] as? String) == "false")
+        #expect((error.errorUserInfo["resolvable"] as? Bool) == false)
         #expect(error.errorUserInfo[NSUnderlyingErrorKey] == nil)
     }
 

@@ -58,7 +58,7 @@ extension GDSError {
             "file": self.file.components(separatedBy: "/").last,
             "function": self.function,
             "line": self.line,
-            "resolvable": String(self.resolvable),
+            "resolvable": self.resolvable,
             NSUnderlyingErrorKey: self.originalError,
             NSLocalizedDescriptionKey: self.errorDescription,
             NSLocalizedFailureReasonErrorKey: self.failureReason
