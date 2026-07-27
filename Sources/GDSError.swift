@@ -52,18 +52,6 @@ extension GDSError {
     }
 
     public var errorUserInfo: [String: Any] {
-        var originalErrorString: String? = self.originalError?.localizedDescription
-        var originalKind: String?
-
-        if let originalError {
-            if let original = originalError as? (any GDSError) {
-                originalErrorString = original.debugDescription
-                originalKind = String(describing: type(of: original.kind)) + "." + String(describing: original.kind)
-            } else {
-                originalKind = String(describing: originalError)
-            }
-        }
-
         let params: [String: Any?] = [
             "kind": self.kind,
             "reason": self.reason,
@@ -73,8 +61,7 @@ extension GDSError {
             "function": self.function,
             "line": self.line,
             "resolvable": String(self.resolvable),
-            "originalErrorKind": originalKind,
-            "originalError": originalErrorString
+            NSUnderlyingErrorKey: self.originalError
         ]
 
         let paramsToLog = params.merging(additionalParameters) { lhs, _ in

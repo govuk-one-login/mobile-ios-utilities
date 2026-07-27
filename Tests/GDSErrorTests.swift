@@ -17,20 +17,116 @@ struct GDSErrorTests {
         #expect((error.errorUserInfo["function"] as? String) == "initialisation()")
         #expect((error.errorUserInfo["line"] as? Int) == 8)
         #expect((error.errorUserInfo["resolvable"] as? String) == "false")
-        #expect(error.errorUserInfo["originalError"] == nil)
-        #expect(error.errorUserInfo["originalErrorKind"] == nil)
+        #expect(error.errorUserInfo[NSUnderlyingErrorKey] == nil)
     }
 
     @Test
-    func originalErrorIsOtherError() {
+    func originalNSErrorIsIncludedAsUnderlyingError() throws {
+        let originalError = NSError(domain: "test", code: 1)
+        let error = ExampleError(.mock1, originalError: originalError)
+
+        let underlyingError = try #require(
+            error.errorUserInfo[NSUnderlyingErrorKey] as? NSError
+        )
+
+        #expect(underlyingError.localizedDescription == originalError.localizedDescription)
+        #expect(String(reflecting: underlyingError) == String(reflecting: originalError))
+        #expect(
+            underlyingError.localizedDescription ==
+                "The operation couldn’t be completed. (test error 1.)"
+        )
+        #expect(
+            String(reflecting: underlyingError) ==
+                "Error Domain=test Code=1 \"(null)\""
+        )
+    }
+
+    @Test
+    func missingOriginalErrorCannotBeInjectedByAdditionalParameters() {
         let error = ExampleError(
             .mock1,
-            originalError: NSError(domain: "test", code: 1)
+            additionalParameters: [
+                NSUnderlyingErrorKey: NSError(domain: "additional", code: 1)
+            ]
         )
-        // swiftlint:disable line_length
-        #expect(error.errorUserInfo["originalError"] as? String == "The operation couldn’t be completed. (test error 1.)")
-        // swiftlint:enable line_length
-        #expect(error.errorUserInfo["originalErrorKind"] as? String == "Error Domain=test Code=1 \"(null)\"")
+
+        #expect(error.originalError == nil)
+        #expect(error.errorUserInfo[NSUnderlyingErrorKey] == nil)
+        #expect((error as NSError).underlyingErrors.isEmpty)
+    }
+
+    @Test
+    func originalNSErrorFailureReasonIsIncludedInUnderlyingErrorDescription() throws {
+        let originalError = NSError(
+            domain: "test",
+            code: 1,
+            userInfo: [
+                NSLocalizedFailureReasonErrorKey: "API request error"
+            ]
+        )
+        let error = ExampleError(.mock1, originalError: originalError)
+
+        let underlyingError = try #require(
+            error.errorUserInfo[NSUnderlyingErrorKey] as? NSError
+        )
+
+        #expect(
+            String(reflecting: underlyingError) ==
+                """
+                Error Domain=test Code=1 "API request error" \
+                UserInfo={NSLocalizedFailureReason=API request error}
+                """
+        )
+    }
+
+    @Test
+    func customNSErrorIsIncludedAsUnderlyingError() throws {
+        let originalError = TestCustomError()
+        let error = ExampleError(.mock1, originalError: originalError)
+
+        let underlyingError = try #require(error.errorUserInfo[NSUnderlyingErrorKey] as? NSError)
+        #expect(underlyingError.domain == TestCustomError.errorDomain)
+        #expect(underlyingError.code == originalError.errorCode)
+    }
+
+    @Test
+    func originalGDSErrorIsIncludedInTheUnderlyingErrorTree() throws {
+        let originalError = ExampleError(.mock1)
+        let error = ExampleError(.mock1, originalError: originalError)
+        let nsError = error as NSError
+
+        #expect(nsError.underlyingErrors.count == 1)
+        let underlyingError = try #require(
+            nsError.underlyingErrors.first as? NSError
+        )
+        #expect(underlyingError.domain == ExampleError.errorDomain)
+        #expect(underlyingError.code == originalError.errorCode)
+    }
+
+    @Test
+    func nestedGDSErrorsFormAnUnderlyingErrorTree() throws {
+        let leafError = NSError(
+            domain: "test",
+            code: 1,
+            userInfo: [NSLocalizedFailureReasonErrorKey: "API request error"]
+        )
+        let middleError = ExampleError(.mock1, originalError: leafError)
+        let rootError = ExampleError(.mock1, originalError: middleError)
+        let rootNSError = rootError as NSError
+
+        #expect(rootNSError.underlyingErrors.count == 1)
+        let middleUnderlyingError = try #require(
+            rootNSError.underlyingErrors.first as? NSError
+        )
+        #expect(middleUnderlyingError.domain == ExampleError.errorDomain)
+        #expect(middleUnderlyingError.code == middleError.errorCode)
+
+        #expect(middleUnderlyingError.underlyingErrors.count == 1)
+        let leafUnderlyingError = try #require(
+            middleUnderlyingError.underlyingErrors.first as? NSError
+        )
+        #expect(leafUnderlyingError.domain == leafError.domain)
+        #expect(leafUnderlyingError.code == leafError.code)
     }
 
     @Test("Error parameters cannot be overridden by additional parameters")
@@ -60,8 +156,8 @@ struct GDSErrorTests {
     }
 
     @Test
-    func error_debugDescription() {
-        #expect(ExampleError(.mock1).debugDescription == "mock1 - This is a mock error")
+    func error_reflectingDescription() {
+        #expect(String(reflecting: ExampleError(.mock1)) == "mock1 - This is a mock error")
     }
 
     @Test
@@ -188,4 +284,10 @@ struct ErrorStub: Error, CustomDebugStringConvertible {
     var debugDescription: String {
         return _debugDescription
     }
+}
+
+private struct TestCustomError: Error, CustomNSError {
+    static let errorDomain = "uk.gov.one-login.test"
+    let errorCode = 1
+    let errorUserInfo: [String: Any] = [:]
 }
