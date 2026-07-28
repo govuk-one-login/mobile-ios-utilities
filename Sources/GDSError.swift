@@ -137,6 +137,11 @@ extension GDSError {
     }
 
     public var errorDescription: String? {
+        localizedDescription
+    }
+
+    @available(*, deprecated, message: "Use #errorDescription()")
+    public var localizedDescription: String {
         kind.localizedDescription
     }
 
