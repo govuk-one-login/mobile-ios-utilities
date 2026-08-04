@@ -98,11 +98,12 @@ extension GDSError {
     /// `GDSError` public contract. Including removed and/or have their value types change over time.
     public var errorUserInfo: [String: Any] {
         var params: [String: Any?] = [
+            "kind": self.kind.stringValue,
             "statusCode": self.statusCode,
             "file": self.file.components(separatedBy: "/").last,
             "function": self.function,
             "line": self.line,
-            "resolvable": self.resolvable,
+            "resolvable": String(self.resolvable),
             NSUnderlyingErrorKey: self.originalError,
             NSLocalizedDescriptionKey: self.errorDescription,
             NSLocalizedFailureReasonErrorKey: self.failureReason

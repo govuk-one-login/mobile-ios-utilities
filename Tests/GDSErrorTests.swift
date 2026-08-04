@@ -17,11 +17,12 @@ struct GDSErrorTests {
         #expect(nsError.code == error.errorCode)
         #expect(error.errorUserInfo[NSLocalizedFailureReasonErrorKey] == nil)
         #expect(error.errorUserInfo[NSURLErrorKey] == nil)
+        #expect(error.errorUserInfo["kind"] as? String == "mock1")
         #expect(error.errorUserInfo["errorCode"] == nil)
         #expect((error.errorUserInfo["file"] as? String) == "GDSErrorTests.swift")
         #expect((error.errorUserInfo["function"] as? String) == "initialisation()")
         #expect((error.errorUserInfo["line"] as? Int) == 10)
-        #expect((error.errorUserInfo["resolvable"] as? Bool) == false)
+        #expect((error.errorUserInfo["resolvable"] as? String) == "false")
         #expect(error.errorUserInfo[NSUnderlyingErrorKey] == nil)
     }
 
@@ -282,6 +283,20 @@ struct GDSErrorTests {
         #expect(GDSExampleErrorKind.mock1.localizedDescription == "This is a mock error")
         #expect(GDSExampleErrorKind.mock1.description == "mock1 - This is a mock error")
         #expect(DescriptionOnlyErrorKind.mock1.localizedDescription == "mock1")
+        #expect(GDSExampleErrorKind.mock1.stringValue == "mock1")
+        #expect(GDSExampleErrorKind.mock1.intValue == 1)
+        #expect(GDSExampleErrorKind(intValue: 1) == .mock1)
+        #expect(GDSExampleErrorKind(stringValue: "mock1") == .mock1)
+    }
+    
+    @Test
+    func test_multipleCaseErrorKind() {
+        #expect(MultipleCaseErrorKind.mock1.stringValue == "mock1")
+        #expect(MultipleCaseErrorKind.mock1.description == "mock1")
+        #expect(MultipleCaseErrorKind.mock2.stringValue == "mock2")
+        #expect(MultipleCaseErrorKind.mock2.description == "mock2")
+        #expect(MultipleCaseErrorKind.mock3.stringValue == "mock3")
+        #expect(MultipleCaseErrorKind.mock3.description == "mock3")
     }
 
     @Test
@@ -343,6 +358,12 @@ struct GDSErrorTests {
 // swiftlint:enable type_body_length
 
 typealias ExampleError = GDSExampleError<GDSExampleErrorKind>
+
+enum MultipleCaseErrorKind: Int, GDSErrorKind {
+    case mock1 = 1
+    case mock2 = 2
+    case mock3 = 3
+}
 
 enum GDSExampleErrorKind: Int, GDSErrorKind {
     case mock1 = 1
@@ -452,5 +473,5 @@ struct ErrorStub: Error, CustomDebugStringConvertible {
 private struct TestCustomError: Error, CustomNSError {
     static let errorDomain = "uk.gov.one-login.test"
     let errorCode = 1
-    let errorUserInfo: [String: Any] = [:]
+    let errorUserInfo: [String: Sendable] = [:]
 }
