@@ -15,7 +15,8 @@
 ///
 /// By using an `enum` you can get the following for free:
 /// * Guaranteed unique error codes that you can scope under a domain
-/// * A short error description that resolves to the enum case (e.g. "one", "two", "three") and can be used as an identifier (i.e. key)
+/// * A short error description that resolves to the enum case (e.g. "one", "two", "three") and can be used as
+/// an identifier (i.e. key)
 ///
 ///
 /// - SeeAlso ``rawValue`` to return a unique `Int` identifier
@@ -31,7 +32,6 @@ public protocol GDSErrorKind: Sendable,
                               RawRepresentable,
                               CodingKey,
                               Equatable where RawValue == Int {
-    
     /// A string containing the localised description of the error.; evaluates to``description`` by default.
     ///
     /// This string is meant to be "user" facing thus localised.

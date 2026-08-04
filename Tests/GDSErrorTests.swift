@@ -288,7 +288,7 @@ struct GDSErrorTests {
         #expect(GDSExampleErrorKind(intValue: 1) == .mock1)
         #expect(GDSExampleErrorKind(stringValue: "mock1") == .mock1)
     }
-    
+
     @Test
     func test_multipleCaseErrorKind() {
         #expect(MultipleCaseErrorKind.mock1.stringValue == "mock1")
